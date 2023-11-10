@@ -5,6 +5,7 @@
         }
     },
     "require": {
-        "beycan/response": "^1.0"
+        "beycan/response": "^1.0",
+        "beycanpress/csf": "^2.3"
     }
 }

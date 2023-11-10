@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fece868eb77e81f0c98056b4f0aac35f",
+    "content-hash": "b035040778a60b9f74649d5fb33ef9ff",
     "packages": [
         {
             "name": "beycan/response",
@@ -46,6 +46,33 @@
                 "source": "https://github.com/BeycanDeveloper/response/tree/1.0.1"
             },
             "time": "2021-10-07T10:48:19+00:00"
+        },
+        {
+            "name": "beycanpress/csf",
+            "version": "2.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/BeycanPress/csf.git",
+                "reference": "acd7bd2feae1861f56c7669dadec629b22fae582"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/BeycanPress/csf/zipball/acd7bd2feae1861f56c7669dadec629b22fae582",
+                "reference": "acd7bd2feae1861f56c7669dadec629b22fae582",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0"
+            ],
+            "description": "Codestar Framework composer package",
+            "homepage": "https://github.com/BeycanPress/csf",
+            "support": {
+                "issues": "https://github.com/BeycanPress/csf/issues",
+                "source": "https://github.com/BeycanPress/csf/tree/2.3.2"
+            },
+            "time": "2023-10-11T17:19:44+00:00"
         }
     ],
     "packages-dev": [],
@@ -56,5 +83,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }

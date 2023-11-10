@@ -36,7 +36,9 @@ abstract class Plugin
             'phDir'     => trailingslashit(__DIR__)
         ]);
         
-        require_once $this->phDir . 'csf/csf.php';
+        if (file_exists($this->pluginDir . 'vendor/beycanpress/csf/csf.php')) {
+            require_once $this->pluginDir . 'vendor/beycanpress/csf/csf.php';
+        }
         
         $this->localization();
 
