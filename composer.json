@@ -1,0 +1,10 @@
+{
+    "autoload": {
+        "psr-4": {
+            "BeycanPress\\YAIA\\": "app"
+        }
+    },
+    "require": {
+        "beycan/response": "^1.0"
+    }
+}

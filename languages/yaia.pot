@@ -1,0 +1,477 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Your AI Assistant\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-01-22 02:29+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.6.3; wp-6.1.1\n"
+"X-Domain: yaia"
+
+#: app/MetaBox.php:93
+msgid "1"
+msgstr ""
+
+#: app/MetaBox.php:102
+msgid "10"
+msgstr ""
+
+#: app/MetaBox.php:94
+msgid "2"
+msgstr ""
+
+#: app/MetaBox.php:95
+msgid "3"
+msgstr ""
+
+#: app/MetaBox.php:96
+msgid "4"
+msgstr ""
+
+#: app/MetaBox.php:97
+msgid "5"
+msgstr ""
+
+#: app/MetaBox.php:98
+msgid "6"
+msgstr ""
+
+#: app/MetaBox.php:99
+msgid "7"
+msgstr ""
+
+#: app/MetaBox.php:100
+msgid "8"
+msgstr ""
+
+#: app/MetaBox.php:101
+msgid "9"
+msgstr ""
+
+#: app/MetaBox.php:137
+msgid "Add Conclusion"
+msgstr ""
+
+#: app/MetaBox.php:108
+msgid "Add headings to paragraph"
+msgstr ""
+
+#: app/MetaBox.php:131
+msgid "Add Introduction"
+msgstr ""
+
+#: app/Settings.php:30
+msgid "API Key"
+msgstr ""
+
+#: app/MetaBox.php:76
+msgid "Arabic"
+msgstr ""
+
+#: views/chat-gpt.php:13
+msgid "Ask me..."
+msgstr ""
+
+#: app/Settings.php:90 app/Settings.php:95
+msgid "Backup"
+msgstr ""
+
+#. Author of the plugin
+msgid "BeycanPress"
+msgstr ""
+
+#: app/Pages/ChatGPT.php:18
+msgid "Chat GPT"
+msgstr ""
+
+#: app/MetaBox.php:77
+msgid "Chinese"
+msgstr ""
+
+#: app/Lang.php:17
+msgid "Command running please wait..."
+msgstr ""
+
+#: app/Integrations/Elementor.php:109
+msgid "Content"
+msgstr ""
+
+#: app/AiService.php:276
+msgid "Content creation completed"
+msgstr ""
+
+#: app/Lang.php:10
+msgid "Content creation please wait..."
+msgstr ""
+
+#: app/Settings.php:39
+msgid "Content generator"
+msgstr ""
+
+#: app/Integrations/Elementor.php:120 views/pages/image-generator.php:42
+#: views/pages/image-generator.php:46
+msgid "Create"
+msgstr ""
+
+#: app/MetaBox.php:178 app/MetaBox.php:179
+msgid "Create content"
+msgstr ""
+
+#: app/MetaBox.php:48
+msgid "Custom prompt"
+msgstr ""
+
+#: app/Settings.php:23
+msgid "Data deletion status"
+msgstr ""
+
+#: app/MetaBox.php:126
+msgid "Descriptive"
+msgstr ""
+
+#: app/MetaBox.php:69
+msgid "Dutch"
+msgstr ""
+
+#: views/pages/text-editor.php:25
+msgid "Edit"
+msgstr ""
+
+#: app/AiService.php:127
+msgid "Edit completed"
+msgstr ""
+
+#: app/Settings.php:45
+msgid "Enable OpenAI auto generate content post option"
+msgstr ""
+
+#: app/MetaBox.php:68
+msgid "English"
+msgstr ""
+
+#: app/Lang.php:18
+msgid "Errors"
+msgstr ""
+
+#: app/Settings.php:76
+msgid "For improving the quality and coherence of the generated text."
+msgstr ""
+
+#: app/MetaBox.php:70
+msgid "French"
+msgstr ""
+
+#: app/Settings.php:73
+msgid "Frequency Penalty"
+msgstr ""
+
+#: app/Settings.php:18
+msgid "General options"
+msgstr ""
+
+#: app/MetaBox.php:145
+msgid "Generate Image"
+msgstr ""
+
+#: app/MetaBox.php:71
+msgid "German"
+msgstr ""
+
+#: app/Settings.php:32
+msgid "Get API Key"
+msgstr ""
+
+#: app/MetaBox.php:49
+msgid "GPT-3 will be sent directly to the prompt you enter here."
+msgstr ""
+
+#: app/MetaBox.php:111
+msgid "h1"
+msgstr ""
+
+#: app/MetaBox.php:112
+msgid "h2"
+msgstr ""
+
+#: app/MetaBox.php:113
+msgid "h3"
+msgstr ""
+
+#: app/MetaBox.php:114
+msgid "h4"
+msgstr ""
+
+#: app/MetaBox.php:115
+msgid "h5"
+msgstr ""
+
+#: app/MetaBox.php:116
+msgid "h6"
+msgstr ""
+
+#: views/chat-gpt.php:8
+msgid "Hey, what can I do for you today?"
+msgstr ""
+
+#: app/Settings.php:54
+msgid ""
+"Higher values produce less accurate but varied and creative output. Lower "
+"values will produce more accurate and realistic results."
+msgstr ""
+
+#: app/MetaBox.php:72
+msgid "Hindi"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://beycanpress.com"
+msgstr ""
+
+#. URI of the plugin
+msgid "https://yaia.beycanpress.com"
+msgstr ""
+
+#: app/MetaBox.php:41
+msgid "I want to create a prompt myself"
+msgstr ""
+
+#: app/MetaBox.php:61
+msgid ""
+"If you leave this blank, the WordPress title you entered will be selected. "
+"If you want to enter a special title, you can enter it here."
+msgstr ""
+
+#: app/MetaBox.php:160 views/pages/image-generator.php:22
+msgid "Image count"
+msgstr ""
+
+#: app/AiService.php:228
+msgid "Image generation completed"
+msgstr ""
+
+#: app/AiService.php:230
+msgid "Image generation failed"
+msgstr ""
+
+#: app/Pages/ImageGenerator2.php:16 views/pages/image-generator.php:3
+msgid "Image generator"
+msgstr ""
+
+#: app/Lang.php:15
+msgid "Image is being saved please wait..."
+msgstr ""
+
+#: app/MetaBox.php:151
+msgid "Image prompt"
+msgstr ""
+
+#: app/MetaBox.php:166 views/pages/image-generator.php:30
+msgid "Image sizes"
+msgstr ""
+
+#: app/Lang.php:11
+msgid "Images creation please wait..."
+msgstr ""
+
+#: app/Lang.php:16
+msgid "Images is being saved please wait..."
+msgstr ""
+
+#: app/MetaBox.php:73
+msgid "Indonesian"
+msgstr ""
+
+#: app/MetaBox.php:125
+msgid "Informative"
+msgstr ""
+
+#: views/pages/text-editor.php:9
+msgid "Input:"
+msgstr ""
+
+#. Description of the plugin
+msgid ""
+"It assists you to take advantage of the capabilities of artificial "
+"intelligence such as GPT-3 for WordPress and DALL-E 2, making it easier for "
+"you to use these artificial intelligences. For example, creating ready-made "
+"articles and images."
+msgstr ""
+
+#: app/MetaBox.php:74
+msgid "Italian"
+msgstr ""
+
+#: app/MetaBox.php:75
+msgid "Japanese"
+msgstr ""
+
+#: app/MetaBox.php:78
+msgid "Korean"
+msgstr ""
+
+#: app/MetaBox.php:66
+msgid "Language"
+msgstr ""
+
+#: app/Settings.php:58
+msgid "Maximum tokens"
+msgstr ""
+
+#: app/MetaBox.php:110
+msgid "No"
+msgstr ""
+
+#: app/AiService.php:383
+msgid "Not enough choices generated"
+msgstr ""
+
+#: views/pages/text-editor.php:13
+msgid "Output:"
+msgstr ""
+
+#: app/MetaBox.php:90
+msgid "Paragraphs count"
+msgstr ""
+
+#: app/AiService.php:210
+msgid "Please enter a prompt"
+msgstr ""
+
+#: app/Integrations/Elementor.php:90
+msgid "Please enter prompt"
+msgstr ""
+
+#: app/MetaBox.php:79
+msgid "Polish"
+msgstr ""
+
+#: app/MetaBox.php:80
+msgid "Portuguese"
+msgstr ""
+
+#: app/Settings.php:80
+msgid "Presence Penalty"
+msgstr ""
+
+#: app/Integrations/Elementor.php:97 views/pages/image-generator.php:14
+msgid "Prompt"
+msgstr ""
+
+#: views/pages/text-editor.php:22
+msgid "Prompt:  "
+msgstr ""
+
+#: app/Settings.php:66
+msgid "Randomness output"
+msgstr ""
+
+#: app/Settings.php:51
+msgid "Reality and creativity"
+msgstr ""
+
+#: app/MetaBox.php:81
+msgid "Russian"
+msgstr ""
+
+#: app/Lang.php:13
+msgid "Save all"
+msgstr ""
+
+#: app/Lang.php:14
+msgid "Save image"
+msgstr ""
+
+#: app/Settings.php:14
+msgid "Settings"
+msgstr ""
+
+#: app/AiService.php:356 app/Lang.php:12
+msgid "Something went wrong!"
+msgstr ""
+
+#: app/MetaBox.php:82
+msgid "Spanish"
+msgstr ""
+
+#: app/MetaBox.php:124
+msgid "Standart"
+msgstr ""
+
+#: app/Pages/TextEditor.php:16 views/pages/text-editor.php:3
+msgid "Text editor (fixer)"
+msgstr ""
+
+#: app/Loader.php:29
+msgid "The plugin does not work because you did not enter the OpenAI API code."
+msgstr ""
+
+#: app/Settings.php:26
+msgid ""
+"This setting is passive come by default. You enable this setting. All data "
+"created by the plug-in will be deleted while removing the plug-in."
+msgstr ""
+
+#: app/MetaBox.php:60
+msgid "Title"
+msgstr ""
+
+#: app/Settings.php:69
+msgid "To control randomness of the output."
+msgstr ""
+
+#: app/Settings.php:83
+msgid "To produce more concise text."
+msgstr ""
+
+#: app/MetaBox.php:83
+msgid "Turkish"
+msgstr ""
+
+#: app/MetaBox.php:84
+msgid "Ukranian"
+msgstr ""
+
+#: app/MetaBox.php:92
+msgid "Unlimited"
+msgstr ""
+
+#: app/Settings.php:62
+msgid ""
+"Use with \"Reality and creativity\" to test the authenticity and randomness "
+"of the result."
+msgstr ""
+
+#: views/pages/text-editor.php:18
+msgid ""
+"What kind of change do you want to make on the text you entered in the input "
+"field above? For example, you could say \"Fix the spelling mistakes\"."
+msgstr ""
+
+#: app/MetaBox.php:122
+msgid "Writing Style"
+msgstr ""
+
+#: app/Integrations/Elementor.php:39
+msgid "YAIA Content generator"
+msgstr ""
+
+#: app/Pages/ImageGenerator.php:16
+msgid "YAIA Image generator"
+msgstr ""
+
+#. Name of the plugin
+#: app/Pages/ChatGPT.php:17
+msgid "Your AI Assistant"
+msgstr ""
+
+#: app/MetaBox.php:31
+msgid "Your AI Assistant - Content generator"
+msgstr ""

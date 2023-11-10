@@ -1,0 +1,25 @@
+.swal2-title {
+    line-height: 40px;
+}
+.general {
+    display: flex;
+    flex-direction: row;
+}
+.general .right, .general .left {
+    padding: 10px;
+    width: 50%;
+    box-sizing: border-box;
+}
+.general textarea {
+    width: 100%;
+    height: 250px;
+    min-height: 250px;
+}
+.sub-space {
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+.desc {
+    padding: 10px;
+    box-sizing: border-box;
+}

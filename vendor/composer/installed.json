@@ -1,0 +1,50 @@
+{
+    "packages": [
+        {
+            "name": "beycan/response",
+            "version": "1.0.1",
+            "version_normalized": "1.0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/BeycanDeveloper/response.git",
+                "reference": "38384ef2152d037728bb9a89a422438b86e0bf74"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/BeycanDeveloper/response/zipball/38384ef2152d037728bb9a89a422438b86e0bf74",
+                "reference": "38384ef2152d037728bb9a89a422438b86e0bf74",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.3"
+            },
+            "time": "2021-10-07T10:48:19+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Beycan\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Halil Beycan",
+                    "email": "halilbeycan0@gmail.com"
+                }
+            ],
+            "description": "A simple and useful class to return json response in PHP.",
+            "homepage": "https://github.com/BeycanDeveloper/response",
+            "support": {
+                "issues": "https://github.com/BeycanDeveloper/response/issues",
+                "source": "https://github.com/BeycanDeveloper/response/tree/1.0.1"
+            },
+            "install-path": "../beycan/response"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": []
+}
