@@ -135,7 +135,7 @@ class Elementor extends Widget_Base
 	 * @access protected
 	 */
 	protected function render() {
-		echo $this->get_settings_for_display('content');
+		echo wp_kses_post($this->get_settings_for_display('content'));
 	}
 
 	/**

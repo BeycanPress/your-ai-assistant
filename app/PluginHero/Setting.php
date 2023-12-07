@@ -30,7 +30,7 @@ abstract class Setting
             'menu_title'              => $title,
             'menu_slug'               => self::$prefix,
             'menu_capability'         => 'manage_options',
-            'menu_position'           => null,
+            'menu_position'           => 999,
             'menu_hidden'             => false,
 
             // menu extras
@@ -75,6 +75,8 @@ abstract class Setting
         }
 
         CSF::createOptions(self::$prefix, $params);
+
+        $this->licenseControls();
     }
 
     /**
@@ -93,5 +95,129 @@ abstract class Setting
     public static function get(?string $key = null)
     {
         return Plugin::$instance->setting($key);
+    }
+
+    /**
+     * @return void
+     */
+    private function licenseControls() : void
+    {
+        if ($licenseCode = self::get('license')) {
+            if ($expireTime = get_option($this->pluginKey . '_licenseExpireTime')) {
+                if (time() > strtotime($expireTime)) {
+                    self::deleteLicense();
+                }
+            }
+
+            if (date('Y-m-d') != get_option($this->pluginKey . '_dailyLicenseCheck')) {
+                if (!$this->checkLicense($licenseCode)->success) {
+                    self::deleteLicense();
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $licenseCode
+     * @return object
+     */
+    private function checkLicense(string $licenseCode) : object
+    {
+        $data = $this->verifyLicense($licenseCode, $this->pluginKey);
+        update_option($this->pluginKey . '_licenseData', $data->data);
+        update_option($this->pluginKey . '_dailyLicenseCheck', date('Y-m-d'));
+
+        if (isset($data->data->expireTime) && $data->data->expireTime) {
+            update_option($this->pluginKey . '_licenseExpireTime', $data->data->expireTime);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return void
+     */
+    private function deleteLicense(): void
+    {
+        $settings = self::get();
+        if (isset($settings['license'])) {
+            unset($settings['license']);
+            update_option($this->settingKey, $settings);
+            delete_option($this->pluginKey . '_licenseExpireTime');
+            delete_option($this->pluginKey . '_dailyLicenseCheck');
+        }
+    }
+
+    /**
+     * It checks the validity of the purchase licenseCode you entered and returns true false.
+     * 
+     * @param string $licenseCode
+     * @param string|null $productcode
+     * @return object
+     */
+    public function verifyLicense(string $licenseCode, ?string $productcode = null) : ?object
+    {
+        $headers = ["Content-Type: application/json"];
+
+        $curl = curl_init('https://beycanpress.com/?rest_route=/licensor-api/verify');
+        curl_setopt_array($curl, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_REFERER => $_SERVER["SERVER_NAME"],
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_POSTFIELDS => json_encode([
+                "licenseCode" => trim($licenseCode),
+                "productCode" => trim($productcode)
+            ]),
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_SSL_VERIFYPEER => false
+        ]);
+
+        $resp = json_decode(curl_exec($curl));
+
+        curl_close($curl);
+        
+        return $resp ? $resp : null;
+    }
+    
+    /**
+     * @return void
+     */
+    protected function licensed() : void
+    {
+        add_action("csf_".self::$prefix."_save_after", function($data, $opt) {
+            if (isset($opt->errors['license'])) self::deleteLicense();
+        }, 10, 2);
+
+        self::createSection(array(
+            'id'     => 'license', 
+            'title'  => esc_html__('License'),
+            'icon'   => 'fa fa-key',
+            'priority' => 99999,
+            'fields' => array(
+                array(
+                    'id'    => 'license',
+                    'type'  => 'text',
+                    'title' => esc_html__('License (Purchase code)'),
+                    'sanitize' => function($val) {
+                        return sanitize_text_field($val);
+                    },
+                    'validate' => function($val) {
+                        $val = sanitize_text_field($val);
+                        if (empty($val)) {
+                            return esc_html__('License cannot be empty.');
+                        } elseif (strlen($val) < 36 || strlen($val) > 36) {
+                            return esc_html__('License must consist of 36 characters.');
+                        }
+
+                        $data = $this->checkLicense($val);
+                        
+                        if (!$data->success) {
+                            return esc_html__($data->message . " - Error code: " . $data->errorCode);
+                        }
+                    }
+                ),
+            ) 
+        ));
     }
 }

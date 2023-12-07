@@ -1,0 +1,25 @@
+[
+        'dom' => 'Bfrtip',
+        'responsive' => true,
+        'buttons' => [
+            [
+                'extend' => 'collection',
+                'text' => esc_html__('Export', 'cryptopay'),
+                'buttons' => ['excelHtml5', 'csvHtml5']
+            ]
+        ],
+        'order' => [
+            [ 6, 'desc' ]
+        ],
+        'language' => [
+            'emptyTable' => esc_html__('No data available in table', 'cryptopay'),
+            'search' => esc_html__('Search...', 'cryptopay'),
+            'sInfo' => esc_html__('Showing _START_ to _END_ of _TOTAL_ entries', 'cryptopay'),
+            'paginate' => [
+                'first'    => esc_html__('First', 'cryptopay'),
+                'previous' => esc_html__('Previous', 'cryptopay'),
+                'next'     => esc_html__('Next', 'cryptopay'),
+                'last'     => esc_html__('Last', 'cryptopay')
+            ]
+        ]
+    ]

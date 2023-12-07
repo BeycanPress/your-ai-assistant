@@ -13,7 +13,7 @@ class ChatGPT
     {
         add_action('init', function() {
             add_action('wp_enqueue_scripts', [$this, 'enqueueScripts']);
-            add_shortcode('chat-gpt', [$this, 'chatGPT']);
+            add_shortcode('yaia-chat-gpt', [$this, 'chatGPT']);
         });
     }
 
@@ -23,8 +23,8 @@ class ChatGPT
      */
     public function enqueueScripts()
     {
-        $this->addStyle('css/chat-gpt.css');
-        $key = $this->addScript('js/chat-gpt.js', ['jquery']);
+        $this->addStyle('chat-gpt.css');
+        $key = $this->addScript('chat-gpt.js', ['jquery']);
         wp_localize_script($key, 'YAIA', [
             'bot' => $this->getImageUrl('bot.svg'),
             'user' => $this->getImageUrl('user.svg'),
@@ -39,6 +39,6 @@ class ChatGPT
      */
     public function chatGPT()
     {
-        return $this->view('chat-gpt-fe');
+        return $this->view('chat-gpt-fe', [], ['form' => true]);
     }
 }

@@ -33,7 +33,7 @@ abstract class Page
     {
         $properties = (object) $properties;
 
-        $this->slug = $this->pluginKey . '-' . sanitize_title($properties->pageName);
+        $this->slug = isset($properties->slug) ? $properties->slug : $this->pluginKey . '-' . sanitize_title($properties->pageName);
         $this->url = admin_url('admin.php?page=' . $this->slug);
 
         add_action('admin_menu', function() use ($properties) {
@@ -73,14 +73,14 @@ abstract class Page
                 if (isset($properties->hidden)) {
                     add_action('admin_head', function() {
                         echo '<style>
-                        #adminmenu #toplevel_page_'.$this->slug.' { 
+                        #adminmenu #toplevel_page_'.esc_html($this->slug).' { 
                             display: none;
                         }
                         </style>';
                     });
                 }
             }
-        });
+        }, $properties->priority ?? 10);
 
         $this->addPage($this);
     }

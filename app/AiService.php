@@ -32,8 +32,8 @@ class AiService
      * @var array
      */
     private $openAiModels = [
+        'image' => 'dall-e-2',
         'text'  => 'text-davinci-003',
-        'image' => 'image-alpha-001',
         'text-edit'  => 'text-davinci-edit-001',
         'code-edit'  => 'code-davinci-edit-001'
     ];

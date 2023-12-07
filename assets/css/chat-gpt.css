@@ -104,6 +104,13 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
     line-height: 28px;
+    display: flex;
+}
+
+#yaia-chat-gpt .message img {
+    margin-right: 20px;
+    margin-bottom: 20px;
+    display: inline-block;
 }
 
 /* hides scrollbar */

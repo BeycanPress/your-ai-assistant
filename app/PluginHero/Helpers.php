@@ -7,6 +7,8 @@ namespace BeycanPress\YAIA\PluginHero;
  */
 trait Helpers
 {   
+    private $bpApiUrl = 'https://beycanpress.com/wp-json/bp-api/';
+    
     /**
      * @param string $property
      * @return mixed
@@ -19,24 +21,71 @@ trait Helpers
 
     /**
      * @param string $property
-     * @return mixed
-     */
-    public function __call(string $name , array $arguments)
-    {
-        if (isset(Plugin::$properties->$name)) {
-            $closure = Plugin::$properties->$name;
-            return $closure(...$arguments);
-        }
-    }
-
-    /**
-     * @param string $property
      * @param mixed $value
      * @return mixed
      */
     public function __set(string $property, $value)
     {
-        Plugin::$properties->$property = $value;
+        if (is_array($value)) {
+            foreach ($value as $val) {
+                if (is_object($val)) {
+                    $className = (new \ReflectionClass($val))->getShortName();
+                    if ($className != 'stdClass') {
+                        if (!isset(Plugin::$properties->$property)) {
+                            Plugin::$properties->$property = (object) [];
+                        }
+                        Plugin::$properties->$property->$className = $val;
+                    } else {
+                        Plugin::$properties->$property = $value;
+                    }
+                } else {
+                    Plugin::$properties->$property = $value;
+                }
+            }
+        } elseif (is_object($value)) { 
+            $className = (new \ReflectionClass($value))->getShortName();
+            if ($className != 'stdClass') {
+                if (!isset(Plugin::$properties->$property)) {
+                    Plugin::$properties->$property = (object) [];
+                }
+                Plugin::$properties->$property->$className = $value;
+            } else {
+                Plugin::$properties->$property = $value;
+            }
+        } else {
+            Plugin::$properties->$property = $value;
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param \Closure $closure
+     * @return void
+     */
+    public function addFunc(string $name, \Closure $closure)
+    {
+        if (!isset(Plugin::$properties->funcs)) {
+            Plugin::$properties->funcs = (object) [];
+        }
+
+        if (!isset(Plugin::$properties->funcs->$name)) {
+            Plugin::$properties->funcs->$name = $closure;
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param mixed ...$args
+     * @return mixed
+     */
+    public function callFunc(string $name, ...$args)
+    {
+        if (isset(Plugin::$properties->funcs->$name)) {
+            $closure = Plugin::$properties->funcs->$name;
+            return $closure(...$args);
+        } else {
+            throw new \Exception('Function not found');
+        }
     }
 
     /**
@@ -72,52 +121,27 @@ trait Helpers
      * @param string $viewName Directory name within the folder
      * @return string
      */
-    public function addonView(string $viewName, array $args = []) : string
-    {
-        $trace = debug_backtrace();
-        if (DIRECTORY_SEPARATOR == '\\') {
-            $re = '/.*?\\\\plugins\\\\.*(app\\\\|index\.php)/si';
-        } else {
-            $re = '/.*?\/plugins\/.*(app\/|index\.php)/si';
-        }
-        $addonDir = $trace[1]['function'] == 'addonViewEcho' ? $trace[1]['file'] : $trace[0]['file'];
-        preg_match($re, $addonDir, $matches, PREG_OFFSET_CAPTURE, 0);
-        $viewDir = str_replace(['app\\', 'app/', 'index.php'], 'views/', $matches[0][0]);
-
-        extract($args);
-        ob_start();
-        include $viewDir . $viewName . '.php';
-        return ob_get_clean();
-    }
-
-    /**
-     * @param string $viewName Directory name within the folder
-     * @return void
-     */
-    public function addonViewEcho(string $viewName, array $args = []) : void
-    {
-        print($this->addonView($viewName, $args));
-    }
-
-    /**
-     * @param string $viewName Directory name within the folder
-     * @return string
-     */
     public function view(string $viewName, array $args = []) : string
     {
         extract($args);
         ob_start();
-        include $this->viewDir . $viewName . '.php';
+        include $this->pluginDir . 'views/' . $viewName . '.php';
         return ob_get_clean();
     }
 
     /**
      * @param string $viewName Directory name within the folder
+     * @param array $args
+     * @param array $allowedHtml
      * @return void
      */
-    public function viewEcho(string $viewName, array $args = []) : void
+    public function viewEcho(string $viewName, array $args = [], array $allowedHtml = []) : void
     {
-        print($this->view($viewName, $args));
+        try {
+            $allowedHtml = array_merge_recursive($allowedHtml, $this->parseAllowedHtml($this->pluginDir . 'views/' . $viewName . '.php'));
+        } catch (\Throwable $th) {}
+
+        echo wp_kses($this->view($viewName, $args), array_merge_recursive(wp_kses_allowed_html('post'), $allowedHtml));
     }
 
     /**
@@ -135,15 +159,29 @@ trait Helpers
     }
 
     /**
-     * @param string $viewName Directory name within the folder
-     * @return void
+     * @param string $key
+     * @param mixed $value
+     * @return mixed
      */
-    public function getTemplate(string $templateName, array $args = []) : void
+    public function updateSetting(string $key, $value)
+    {
+        if (is_null(Plugin::$settings)) Plugin::$settings = get_option($this->settingKey); 
+
+        Plugin::$settings[$key] = $value;
+
+        update_option($this->settingKey, Plugin::$settings);
+    }
+
+    /**
+     * @param string $viewName Directory name within the folder
+     * @return string
+     */
+    public function getTemplate(string $templateName, array $args = []) : string
     {
         extract($args);
         ob_start();
         include $this->phDir . 'Templates/' . $templateName . '.php';
-        echo ob_get_clean();
+        return ob_get_clean();
     }
 
     /**
@@ -172,11 +210,11 @@ trait Helpers
      */
     public function notice(string $notice, string $type = 'success', bool $dismissible = false) : void
     {
-        $this->getTemplate('notice', [
+        echo wp_kses_post($this->getTemplate('notice', [
             'type' => $type,
             'notice' => $notice,
             'dismissible' => $dismissible
-        ]);
+        ]));
     }   
 
     /**
@@ -243,9 +281,9 @@ trait Helpers
      */
     public function checkNonceField(?string $externalKey = null) : bool
     {
-        $key = $this->pluginKey . '_nonce' . $externalKey;
         if (!isset($_POST['nonce'])) return false;
-        return @wp_verify_nonce($_POST['nonce'], $key) ? true : false;
+        $key = $this->pluginKey . '_nonce' . $externalKey;
+        return @wp_verify_nonce(sanitize_text_field($_POST['nonce']), $key) ? true : false;
     }
 
     /**
@@ -254,18 +292,47 @@ trait Helpers
     public function getCurrentUrl() : string
     {
         $siteURL = explode('/', get_site_url());
-        $requestURL = explode('/', $_SERVER['REQUEST_URI']);
+        $requestURL = explode('/', esc_url_raw($_SERVER['REQUEST_URI']));
         $currentURL = array_unique(array_merge($siteURL, $requestURL));
         return implode('/', $currentURL);
+    }
+
+    /**
+     * @param string $datetime
+     * @return \DateTime
+     */
+    public function getTime(string $datetime = 'now') : \DateTime
+    {
+        return new \DateTime($datetime, new \DateTimeZone(wp_timezone_string()));
+    }
+
+    /**
+     * @param string $datetime
+     * @return \DateTime
+     */
+    public function getUTCTime(string $datetime = 'now') : \DateTime
+    {
+        return new \DateTime($datetime, new \DateTimeZone('UTC'));
     }
 
     /**
      * @param string $url
      * @return void
      */
+    public function redirect(string $url) : void
+    {
+        wp_redirect($url);
+        exit();
+    }
+    
+    /**
+     * @param string $url
+     * @return void
+     */
     protected function pageRedirect(string $url) : void
     {
-        die("<script>window.location.href = '".$url."'</script>");
+        echo "<script>window.location.href = '".esc_url_raw($url)."'</script>";
+        die();
     }
 
     /**
@@ -275,7 +342,8 @@ trait Helpers
     public function adminRedirect(string $url) : void
     {
         add_action('admin_init', function() use ($url) {
-			die(wp_redirect($url));
+			wp_redirect($url);
+            exit();
 		});
     }
 
@@ -286,7 +354,8 @@ trait Helpers
     public function templateRedirect(string $url) : void
     {
         add_action('template_redirect', function() use ($url) {
-			die(wp_redirect($url));
+            wp_redirect($url);
+			exit();
 		});
     }
 
@@ -367,10 +436,14 @@ trait Helpers
      */
     public function addScript(string $path, array $deps = []) : string
     {
+        $f = substr($path, 0, 1);
         $key = explode('/', $path);
+        $key = $this->pluginKey . '-' . preg_replace('/\..*$/', '', end($key));
+        $middlePath = $f === '/' ? 'assets' : 'assets/js/';
+        $url = $this->pluginUrl . $middlePath . $path;
         wp_enqueue_script(
-            $key = $this->pluginKey . '-' . end($key),
-            $this->pluginUrl . 'assets/' . $path,
+            $key,
+            $url,
             $deps,
             $this->pluginVersion,
             true
@@ -386,69 +459,19 @@ trait Helpers
      */
     public function addStyle(string $path, array $deps = []) : string
     {
+        $f = substr($path, 0, 1);
         $key = explode('/', $path);
+        $key = $this->pluginKey . '-' . preg_replace('/\..*$/', '', end($key));
+        $middlePath = $f === '/' ? 'assets' : 'assets/css/';
+        $url = $this->pluginUrl . $middlePath . $path;
         wp_enqueue_style(
-            $key = $this->pluginKey . '-' . end($key),
-            $this->pluginUrl . 'assets/' . $path,
+            $key,
+            $url,
             $deps,
             $this->pluginVersion
         );
         
         return $key;
-    }
-
-    /**
-     * @param string $path
-     * @param array $deps
-     * @return string
-     */
-    public function addAddonScript(string $path, array $deps = []) : string
-    {
-        $key = explode('/', $path);
-        wp_enqueue_script(
-            $key = $this->pluginKey . '-addon-' . end($key),
-            $this->getAddonAssetsDir() . $path,
-            $deps,
-            $this->pluginVersion,
-            true
-        );
-        
-        return $key;
-    }
-
-    /**
-     * @param string $path
-     * @param array $deps
-     * @return string
-     */
-    public function addAddonStyle(string $path, array $deps = []) : string
-    {
-        $key = explode('/', $path);
-        wp_enqueue_style(
-            $key = $this->pluginKey . '-addon-' . end($key),
-            $this->getAddonAssetsDir() . $path,
-            $deps,
-            $this->pluginVersion
-        );
-        
-        return $key;
-    }
-
-    /**
-     * @return string
-     */
-    private function getAddonAssetsDir() : string
-    {
-        $trace = debug_backtrace();
-        if (DIRECTORY_SEPARATOR == '\\') {
-            $re = '/plugins\\\\(.*)(app\\\\|index\.php)/m';
-        } else {
-            $re = '/plugins\/(.*)(app\/|index\.php)/m';
-        }
-        
-        preg_match($re, $trace[1]['file'], $matches, PREG_OFFSET_CAPTURE, 0);
-
-        return preg_replace(['/plugins\/.*/m'], ['plugins/'.$matches[1][0].'/assets/'], $this->pluginUrl);
     }
 
     /**
@@ -458,7 +481,7 @@ trait Helpers
     {
         $ip = null;
 		if (isset($_SERVER['REMOTE_ADDR'])) {
-			$ip = wp_unslash($_SERVER['REMOTE_ADDR']);
+			$ip = sanitize_text_field($_SERVER['REMOTE_ADDR']);
 			$ip = rest_is_ip_address($ip);
 			if (false === $ip) {
 				$ip = null;
@@ -472,23 +495,24 @@ trait Helpers
      * @param string $templateName
      * @param string $templateFile
      * @param array $params
+     * @param array $allowedHtml
      * @return void
      */
-    public function registerPageTemplate(string $templateName, string $templateFile, array $params) : void
+    public function registerPageTemplate(string $templateName, string $templateFile, array $params = [], array $allowedHtml = []) : void
     {
         add_filter('theme_page_templates', function($templates) use ($templateName, $templateFile){
             $templateFile = $this->pluginKey . $templateFile;
             return array_merge($templates, [$templateFile => esc_html($templateName)]);
         });
 
-        add_filter('template_include', function($template) use ($params) {
+        add_filter('template_include', function($template) use ($params, $allowedHtml) {
             global $post;
             
             if ($post && is_page()) {
 				$pageTemplate = get_page_template_slug($post->ID);
 
 				if (strpos($pageTemplate, $this->pluginKey) !== false) {
-					exit($this->viewEcho('page-templates/' . str_replace($this->pluginKey,  '', $pageTemplate), $params));
+					$this->viewEcho('page-templates/' . str_replace($this->pluginKey,  '', $pageTemplate), $params, $allowedHtml);
 				}    
 			}   
             
@@ -498,20 +522,12 @@ trait Helpers
 
     /**
      * @param callable $function
-     * @param string $name
+     * @param string $file
      * @param int $time
      * @return object
      */
-    public function cache(callable $function, string $name, int $time = 600) : object
+    public function cache(callable $function, string $file, int $time = 600) : object
     {
-        $path = $this->viewDir . 'cache/';
-
-        if (!file_exists($path)) {
-            mkdir($path);       
-        } 
-
-        $file = $path . $name . '.html';
-
         if (file_exists($file) && time() - $time < filemtime($file)) {
             $content = file_get_contents($file);
         } else {
@@ -535,12 +551,64 @@ trait Helpers
      */
     public function deleteCache(string $name) : bool
     {
-        $path = $this->viewDir . 'cache/';
+        $path = $this->pluginDir . 'cache/';
         $file = $path . $name . '.html';
         if (file_exists($file)) {
             return unlink($file);
         } else {
             return false;
+        }
+    }
+
+    /**
+     * @param string $message
+     * @param string $level
+     * @param array $context
+     * @return void
+     */
+    public function debug(string $message, string $level = 'INFO', array $context = [])
+    {
+        if ($this->debugging) {
+            $trace = debug_backtrace();
+
+            $content = $this->getTemplate('log', [
+                'level' => $level,
+                'message' => $message,
+                'file' => $trace[0]['file'] . '(' . $trace[0]['line'] . ')',
+                'class' => $trace[1]['class'] ?? null,
+                'function' => $trace[1]['function'] ?? null,
+                'date' => $this->getTime()->format('Y-m-d H:i:s'),
+                'context' => print_r(array_merge($this->debugDefaultContext ?? [], $context), true)
+            ]);
+
+            $file = $this->pluginDir . 'debug.log';
+            
+            $fp = fopen($file, 'a+');
+            fwrite($fp, $content);
+            fclose($fp);
+        }
+    }
+
+    /**
+     * @return ?string
+     */
+    public function getLogFile() : ?string
+    {
+        $file = $this->pluginDir . 'debug.log';
+        if (file_exists($file)) {
+            return file_get_contents($file);
+        } else {
+            return null;
+        }    
+    }
+    
+    /**
+     * @return void
+     */
+    public function deleteLogFile()
+    {
+        if (file_exists($this->pluginDir . 'debug.log')) {
+            unlink($this->pluginDir . 'debug.log');
         }
     }
 
@@ -551,21 +619,28 @@ trait Helpers
      */
     public function toString(string $amount, int $decimals) : string
     {
-        $pos = stripos((string) $amount, 'E-');
+        $pos1 = stripos((string) $amount, 'E-');
+        $pos2 = stripos((string) $amount, 'E+');
     
-        if ($pos !== false) {
+        if ($pos1 !== false) {
             $amount = number_format($amount, $decimals, '.', ',');
+        }
+
+        if ($pos2 !== false) {
+            $amount = number_format($amount, $decimals, '.', '');
         }
     
         return $amount > 1 ? $amount : rtrim($amount, '0');
     }
 
     /**
-     * @param string $address
-     * @return string
+     * @param string|null $address
+     * @return string|null
      */
-    public function parseDomain(string $address) : string
+    public function parseDomain(?string $address) : ?string
     { 
+		if (!$address) return $address;
+		
         $parseUrl = parse_url(trim($address)); 
         if (isset($parseUrl['host'])) {
             return trim($parseUrl['host']);
@@ -574,4 +649,311 @@ trait Helpers
             return array_shift($domain);
         }
     } 
+    
+     /**
+     * @param string $filePath
+     * @return array
+     */
+    public function parseAllowedHtml(string $filePath) : array 
+    {
+        $html = file_get_contents($filePath);
+
+        $tagAttributes = [];
+
+        $dom = new \DOMDocument();
+        @$dom->loadHTML($html);
+
+        $tags = $dom->getElementsByTagName('*');
+
+        foreach ($tags as $tag) {
+            $tagName = $tag->tagName;
+
+            if (!array_key_exists($tagName, $tagAttributes)) {
+                $tagAttributes[$tagName] = [];
+            }
+
+            foreach ($tag->attributes as $attr) {
+                $attributeName = $attr->name;
+                if (!array_key_exists($attributeName, $tagAttributes[$tagName])) {
+                    $tagAttributes[$tagName][$attributeName] = true;
+                }
+            }
+        }
+
+        return $tagAttributes;
+    }
+    
+    /**
+     * @param string $domain
+     * @return boolean
+     */
+    public function isValidDomain(string $domain) : bool {
+        if (!preg_match('/^[a-zA-Z0-9\-]+(\.[a-zA-Z]{2,})+$/', $domain)) {
+            return false;
+        }
+    
+        return true;
+    }
+
+    /**
+     * @param mixed $closureOrMethodName
+     * @return void
+     */
+    public function registerActivation($closureOrMethodName) : void
+    {
+        register_activation_hook($this->pluginFile, $closureOrMethodName);
+    }
+
+    /**
+     * @param mixed $closureOrMethodName
+     * @return void
+     */
+    public function registerDeactivation($closureOrMethodName) : void
+    {
+        register_deactivation_hook($this->pluginFile, $closureOrMethodName);
+    }
+
+    /**
+     * @param mixed $closureOrMethodName
+     * @return void
+     */
+    public function registerUninstall($closureOrMethodName) : void
+    {
+        register_uninstall_hook($this->pluginFile, $closureOrMethodName);
+    }
+
+    /**
+     * @param string $field
+     * @param array $value
+     * @return object|null
+     */
+    public function getUserBy(string $field, $value) : ?object
+    {
+        global $wpdb;
+        return $wpdb->get_row("SELECT * FROM $wpdb->users WHERE $field = '$value'");
+    }
+
+    /**
+     * @return string
+     */
+    public function getAdminEmail() : string
+    {
+        try {
+            try {
+                return wp_get_current_user()->user_email;
+            } catch (\Throwable $th) {
+                global $wpdb;
+                return ($wpdb->get_row("SELECT * FROM {$wpdb->users} WHERE ID = 1"))->user_email;
+            }
+        } catch (\Throwable $th) {
+            return get_option('admin_email');
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getSiteInfos() : array
+    {
+        return [
+            'email' => $this->getAdminEmail(),
+            'pluginKey' => $this->pluginKey,
+            'pluginVersion' => $this->pluginVersion,
+            'siteUrl' => get_site_url(),
+            'siteName' => get_bloginfo('name'),
+        ];
+    }
+
+    /**
+     * @param bool $form
+     * @param string|null $wpOrgSlug
+     * 
+     * @return void
+     */
+    public function feedback(bool $form = true, ?string $wpOrgSlug = null) : void
+    {
+        $this->registerActivation([$this, '_sendActivationInfo']);
+
+        if ($form) {
+            global $pagenow;
+            if ($pagenow === 'plugins.php') {
+                add_action('admin_enqueue_scripts', function() {
+                    wp_enqueue_style($this->pluginKey . '-feedback', $this->pluginUrl . 'app/PluginHero/templates/feedback.css', [], $this->pluginVersion);
+                    wp_enqueue_script($this->pluginKey . '-feedback', $this->pluginUrl . 'app/PluginHero/templates/feedback.js', [], $this->pluginVersion);
+                });
+                add_action('admin_footer', function() use ($wpOrgSlug) {
+                    $allowedHtml = wp_kses_allowed_html('post');
+                    $allowedHtml['input'] = array(
+                        'type' => true,
+                        'value' => true,
+                        'class' => true,
+                        'name' => true,
+                        'data-reason-code' => true,
+                        'id' => true,
+                    );
+                    echo wp_kses($this->getTemplate('feedback', array_merge([
+                        'wpOrgSlug' => $wpOrgSlug
+                    ], $this->getSiteInfos())), $allowedHtml);
+                });
+            }
+
+            $this->sendDeactivationInfoApi();
+        } else {
+            $this->registerDeactivation(function() {
+                $this->_sendDeactivationInfo([
+                    'reason' => 'Without feedback form',
+                    'email' => $this->getAdminEmail(),
+                ]);
+            });
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function sendDeactivationInfoApi() : void
+    {
+        add_action('rest_api_init', function () {
+            register_rest_route($this->pluginKey . '-deactivation', 'deactivate', [
+                'callback' => [$this, '_sendDeactivationInfoApi'],
+                'methods' => ['POST'],
+                'permission_callback' => '__return_true'
+            ]);
+        });
+    }
+
+    /**
+     * @return void
+     */
+    public function _sendDeactivationInfoApi() : void
+    {
+        delete_option($this->pluginKey . '_feedback_activation');
+        if (function_exists('curl_version')) {
+            try {
+                $this->_sendDeactivationInfo([
+                    'email' => isset($_POST['email']) ? sanitize_email($_POST['email']) : null,
+                    'reason' =>  isset($_POST['reason']) ? sanitize_text_field($_POST['reason']) : null,
+                    'reasonCode' =>  isset($_POST['reasonCode']) ? sanitize_text_field($_POST['reasonCode']) : null,
+                ]);
+            } catch (\Exception $e) {
+                wp_send_json_success($e->getMessage());
+                return;
+            }
+        }
+
+        wp_send_json_success();
+    }
+
+    /**
+     * @param string $message
+     * 
+     * @return bool
+     */
+    public function _sendFeedbackMessage(string $message) : bool
+    {
+        if (function_exists('curl_version')) {
+            try {
+
+                $data = array_merge([
+                    'message' => 'message',
+                ], $this->getSiteInfos());
+                
+                wp_remote_post($this->bpApiUrl . 'plugin-feedbacks', [
+                    'body' => $data
+                ]);
+
+                return true;
+            } catch (\Exception $th) {
+                return false;
+            }
+        }
+
+        return false;
+    }
+    
+    /**
+     * @return bool
+     */
+    public function _sendActivationInfo() : bool
+    {
+        if (function_exists('curl_version')) {
+            try {
+
+                $data = array_merge([
+                    'process' => 'activation',
+                ], $this->getSiteInfos());
+
+                wp_remote_post($this->bpApiUrl . 'active-plugins', [
+                    'body' => $data
+                ]);
+
+                return true;
+            } catch (\Exception $th) {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $params
+     * 
+     * @return bool
+     */
+    public function _sendDeactivationInfo(array $params = []) : bool
+    {
+        if (function_exists('curl_version')) {
+            try {
+
+                $data = array_merge([
+                    'process' => 'deactivation',
+                ], array_merge(
+                    $this->getSiteInfos(), 
+                    $params
+                ));
+
+                wp_remote_post($this->bpApiUrl . 'active-plugins', [
+                    'body' => $data
+                ]);
+
+                return true;
+            } catch (\Exception $e) {
+                return false;
+            }
+        }
+
+        return false;
+    }
+    
+    /**
+     * @param string $key
+     * @param string $file
+     * @return void
+     */
+    public function registerAddon(string $key, string $file) : void
+    {
+        if (!isset(Plugin::$properties->addons)) {
+            Plugin::$properties->addons = (object) [];
+        }
+        
+        if (!isset(Plugin::$properties->addons->$key)) {
+            Plugin::$properties->addons->$key = new Addon($key, $file);
+        } else {
+            throw new \Exception('Addon already registered');
+        }
+    }
+
+    /**
+     * @param string $file
+     * @return object
+     */
+    public function getPluginData(string $file) : object
+    {
+        if (!function_exists('get_plugin_data')) {
+            require_once(ABSPATH . 'wp-admin/includes/plugin.php');
+        }
+
+        return (object) get_plugin_data($file);
+    }
 }

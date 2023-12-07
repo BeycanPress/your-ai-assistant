@@ -29,8 +29,8 @@ class ChatGPT extends Page
      */
     public function enqueueScripts()
     {
-        $this->addStyle('css/chat-gpt.css');
-        $this->addScript('js/chat-gpt.js');
+        $this->addStyle('chat-gpt.css');
+        $this->addScript('chat-gpt.js');
     }
 
     /**
@@ -38,6 +38,6 @@ class ChatGPT extends Page
      */
     public function page()
     {
-        $this->viewEcho('chat-gpt-be');
+        $this->viewEcho('chat-gpt-be', [], ['form' => true]);
     }
 }

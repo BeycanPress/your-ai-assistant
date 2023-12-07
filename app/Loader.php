@@ -65,9 +65,9 @@ class Loader extends Plugin
         global $pagenow;
 
         if (in_array($pagenow, $this->loadScriptThisPages) || $this->isYaiaPages()) {
-            $this->addStyle('css/admin.css');
-            $this->addScript('js/sweetalert2.js');
-            $jsKey = $this->addScript('js/main.js', ['jquery']);
+            $this->addStyle('admin.css');
+            $this->addScript('sweetalert2.js');
+            $jsKey = $this->addScript('main.js', ['jquery']);
             $this->loadJsVariable($jsKey);
         }
     }
@@ -107,7 +107,7 @@ class Loader extends Plugin
     {
         add_action('wp_enqueue_scripts', function() {
             if (isset($_GET['action']) && $_GET['action'] == 'elementor') {
-                $this->addStyle('css/admin.css');
+                $this->addStyle('admin.css');
             }
             
             $this->registerScript('js/sweetalert2.js', 'yaiaSweetAlert2');
